@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+    <!-- ✅ SEO Essentials -->
+    <title>Resonae Labs – Engineering Solutions</title>
+    <meta name="description" content="Resonae Labs is a multidisciplinary engineering powerhouse delivering solutions across mechanical, electrical, electronics, and computer systems.">
+    <meta name="keywords" content="engineering, robotics, electronics, product design, automation, resonae labs">
+    <meta name="author" content="Resonae Labs">
+
+    <!-- ✅ Open Graph (Social Sharing: LinkedIn, WhatsApp, etc.) -->
+    <meta property="og:title" content="Resonae Labs – Engineering Solutions">
+    <meta property="og:description" content="Engineering powerhouse across mechanical, electrical, electronics, and computer systems delivering end-to-end solutions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://resonaelabs.com">
+    <meta property="og:image" content="https://resonaelabs.com/assets/logo.png"> <!-- 🔁 replace with your logo/banner -->
+
+    <!-- ✅ Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Resonae Labs – Engineering Solutions">
+    <meta name="twitter:description" content="Multidisciplinary engineering powerhouse across mechanical, electrical, and electronics.">
+    <meta name="twitter:image" content="https://resonaelabs.com/assets/logo.png"> <!-- 🔁 replace with your logo/banner -->
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- 🚀 Keep your existing scripts/styles -->
+    <script type="text/javascript">
+      // Enhanced SPA routing for GitHub Pages
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+      
+      // Additional routing support
+      window.addEventListener('popstate', function(event) {
+        if (window.location.pathname !== '/') {
+          window.location.href = '/';
+        }
+      });
+    </script>
+    <script type="module" crossorigin src="./assets/index-CHyBjnbh.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DHsJGogP.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Fix for React Router on GitHub Pages
+      window.addEventListener('load', function() {
+        if (window.location.pathname !== '/') {
+          window.history.replaceState(null, null, '/');
+        }
+      });
+    </script>
+  </body>
+</html>
