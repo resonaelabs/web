@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# Block common non-content paths (if present)
+Disallow: /assets/*.map
+
 Sitemap: https://resonaelabs.com/sitemap.xml
