@@ -1,7 +1,11 @@
 User-agent: *
 Allow: /
 
-# Block common non-content paths (if present)
-Disallow: /assets/*.map
-
+# Sitemap location
 Sitemap: https://resonaelabs.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Allow all search engines to index
+Disallow:

@@ -1,0 +1,36 @@
+{
+  "name": "resonaelabs-website",
+  "version": "1.0.0",
+  "description": "Resonae Labs official website - Engineering excellence in robotics, industrial automation, IoT systems, AI control, and system integration",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "python -m http.server 8000",
+    "test": "echo 'No tests specified' && exit 0"
+  },
+  "keywords": [
+    "robotics",
+    "automation",
+    "IoT",
+    "AI",
+    "engineering",
+    "industrial automation",
+    "embedded systems",
+    "control systems",
+    "prototyping",
+    "system integration"
+  ],
+  "author": "Resonae Labs",
+  "license": "MIT",
+  "homepage": "https://resonaelabs.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/resonaelabs/resonaelabs.github.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/resonaelabs/resonaelabs.github.io/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
