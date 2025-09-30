@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
     <title>Resonae Labs - Robotics, Industrial Automation & AI Control Systems</title>
     <meta name="description" content="Resonae Labs specializes in robotics system design, industrial automation, IoT & embedded systems, AI control systems, rapid prototyping, and system integration. Contact us via WhatsApp or email for consultation." />
     <meta name="keywords" content="robotics system design, industrial automation, IoT embedded systems, AI control systems, prototyping R&D, system integration, process automation, smart devices, machine learning, predictive maintenance" />
@@ -98,12 +98,132 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.0.47/build/spline-viewer.js"></script>
+    
+    <!-- Mobile Detection and Fallback Styles -->
+    <style>
+      /* Mobile detection and fallback styles */
+      .spline-container {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+      }
+      
+      .spline-fallback {
+        display: none;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        flex-direction: column;
+      }
+      
+      .fallback-content h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+      
+      .fallback-content p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+      }
+      
+      .try-anyway-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      
+      .try-anyway-btn:hover {
+        background: white;
+        color: #667eea;
+      }
+      
+      /* Hide Spline on mobile, show fallback */
+      @media (max-width: 768px) {
+        spline-viewer {
+          display: none !important;
+        }
+        .spline-fallback {
+          display: flex;
+        }
+      }
+    </style>
+    
+    <!-- Conditionally load Spline only on desktop -->
+    <script>
+      // Check if mobile device
+      function isMobileDevice() {
+        return (typeof window.orientation !== "undefined") || 
+               (navigator.userAgent.indexOf('IEMobile') !== -1) ||
+               (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent));
+      }
+      
+      // Load Spline only on desktop by default
+      if (!isMobileDevice()) {
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'https://unpkg.com/@splinetool/viewer@1.0.47/build/spline-viewer.js';
+        document.head.appendChild(script);
+        
+        // Mark that Spline should be visible
+        document.addEventListener('DOMContentLoaded', function() {
+          const root = document.getElementById('root');
+          if (root) {
+            root.setAttribute('data-spline-enabled', 'true');
+          }
+        });
+      }
+      
+      // Function to force load Spline (for "Try Anyway" button)
+      window.loadSplineAnyway = function() {
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = 'https://unpkg.com/@splinetool/viewer@1.0.47/build/spline-viewer.js';
+        document.head.appendChild(script);
+        
+        // Hide fallback and show Spline container
+        const fallback = document.querySelector('.spline-fallback');
+        if (fallback) {
+          fallback.style.display = 'none';
+        }
+        
+        // Force show any spline-viewer elements
+        const splineViewers = document.querySelectorAll('spline-viewer');
+        splineViewers.forEach(viewer => {
+          viewer.style.display = 'block';
+        });
+      };
+    </script>
+    
     <script type="module" crossorigin src="/assets/index-CLYlwehi.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-Bactl0gm.css">
   </head>
   <body>
-     
     <div id="root"></div>
+    
+    <!-- Spline Fallback Container -->
+    <div class="spline-container">
+      <div class="spline-fallback">
+        <div class="fallback-content">
+          <h2>Enhanced 3D Experience</h2>
+          <p>Our interactive 3D animation works best on desktop devices or modern mobile devices with advanced graphics capabilities.</p>
+          <p>You can continue to explore our website content, or try loading the 3D experience anyway if you're on a capable device.</p>
+          <button class="try-anyway-btn" onclick="window.loadSplineAnyway()">
+            Try 3D Experience Anyway
+          </button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
