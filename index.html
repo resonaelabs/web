@@ -1,109 +1,601 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Resonae Labs - Robotics, Industrial Automation & AI Control Systems</title>
-    <meta name="description" content="Resonae Labs specializes in robotics system design, industrial automation, IoT & embedded systems, AI control systems, rapid prototyping, and system integration. Contact us via WhatsApp or email for consultation." />
-    <meta name="keywords" content="robotics system design, industrial automation, IoT embedded systems, AI control systems, prototyping R&D, system integration, process automation, smart devices, machine learning, predictive maintenance" />
-    <meta name="author" content="Resonae Labs" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://resonaelabs.com" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resonae Labs | Intelligent Manufacturing</title>
     
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://resonaelabs.com" />
-    <meta property="og:title" content="Resonae Labs - Robotics, Industrial Automation & AI Control Systems" />
-    <meta property="og:description" content="Comprehensive engineering services: Robotics System Design, Industrial Automation, IoT & Embedded Systems, AI Control Systems, Prototyping & R&D, and System Integration." />
-    <meta property="og:site_name" content="Resonae Labs" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://resonaelabs.com" />
-    <meta property="twitter:title" content="Resonae Labs - Engineering Excellence" />
-    <meta property="twitter:description" content="Robotics, Industrial Automation, IoT & Embedded Systems, AI Control Systems, Prototyping & R&D, and System Integration services." />
-    
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Resonae Labs",
-      "url": "https://resonaelabs.com",
-      "logo": "https://resonaelabs.com/logo.png",
-      "description": "Engineering services provider specializing in robotics system design, industrial automation, IoT & embedded systems, AI control systems, prototyping & R&D, and system integration",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "info@resonaelabs.com",
-        "contactType": "Customer Service"
-      },
-      "sameAs": [
-        "https://github.com/resonaelabs",
-        "https://linkedin.com/company/resonaelabs",
-        "https://twitter.com/resonaelabs"
-      ],
-      "areaServed": "Worldwide",
-      "makesOffer": [
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Robotics System Design",
-            "description": "Custom robotic solutions for industrial applications, from concept to deployment"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Industrial Automation",
-            "description": "Complete automation solutions to optimize manufacturing processes and efficiency"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "IoT & Embedded Systems",
-            "description": "Smart connected devices and embedded solutions for intelligent automation"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "AI & Control Systems",
-            "description": "Intelligent control systems powered by artificial intelligence and machine learning"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Prototyping & R&D",
-            "description": "Rapid prototyping and research & development support for innovative solutions"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "System Integration",
-            "description": "Seamless integration of complex systems for unified operation and control"
-          }
-        }
-      ]
-    }
-    </script>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Google Fonts: Inter for that clean, tech look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.0.47/build/spline-viewer.js"></script>
-    <script type="module" crossorigin src="/assets/index-CLYlwehi.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Bactl0gm.css">
-  </head>
-  <body>
-     
-    <div id="root"></div>
-  </body>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons: Using explicit UMD build to ensure global variable availability -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f7; /* Apple-like light grey background */
+            color: #1d1d1f;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d2d2d7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #86868b;
+        }
+
+        /* Hero Canvas Container */
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 0;
+            opacity: 0; /* Fade in on load */
+            transition: opacity 1.5s ease;
+            background: radial-gradient(circle at center, #ffffff 0%, #eef1f5 100%);
+        }
+
+        /* Navigation Glassmorphism */
+        nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background-color: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Typography Utilities */
+        .text-gradient {
+            background: linear-gradient(135deg, #1d1d1f 0%, #434344 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Card Hover Effects */
+        .tech-card {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+        }
+        .tech-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        }
+
+        /* Utility */
+        .container-width {
+            max-width: 980px; /* Apple's standard content width */
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="container-width mx-auto h-12 flex items-center justify-between">
+            <a href="#" class="text-xl font-semibold tracking-tight text-gray-900 z-50">Resonae Labs</a>
+            
+            <div class="hidden md:flex space-x-8 text-xs font-medium text-gray-600">
+                <a href="#philosophy" class="hover:text-black transition-colors">Philosophy</a>
+                <a href="#expertise" class="hover:text-black transition-colors">Expertise</a>
+                <a href="#solutions" class="hover:text-black transition-colors">Solutions</a>
+                <a href="#contact" class="hover:text-black transition-colors">Contact</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-gray-900 z-50">
+                <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+        <!-- 3D Canvas -->
+        <div id="canvas-container"></div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 text-center px-4 mt-20 pointer-events-none">
+            <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter mb-6 text-gray-900 reveal active">
+                Automation.<br>
+                Humanized.
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-500 max-w-2xl mx-auto font-light leading-relaxed reveal active" style="transition-delay: 0.2s;">
+                Resonae Labs merges advanced robotics with intuitive design to redefine the manufacturing floor.
+            </p>
+            <div class="mt-10 reveal active pointer-events-auto" style="transition-delay: 0.4s;">
+                <a href="#expertise" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-full text-white bg-black hover:bg-gray-800 transition-all duration-300">
+                    Discover Our Technology
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-50">
+            <i data-lucide="chevron-down" class="w-6 h-6"></i>
+        </div>
+    </header>
+
+    <!-- Mission & Vision Section -->
+    <section id="philosophy" class="py-32 bg-[#f5f5f7]">
+        <div class="container-width">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div class="reveal">
+                    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">Our Philosophy</h2>
+                    <h3 class="text-4xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight leading-tight">
+                        Complex technology,<br>
+                        made accessible.
+                    </h3>
+                </div>
+                <div class="reveal" style="transition-delay: 0.2s;">
+                    <p class="text-lg text-gray-600 leading-relaxed mb-6">
+                        At Resonae Labs, we believe the future of manufacturing belongs to everyone. We exist to strip away the complexity of industrial automation.
+                    </p>
+                    <p class="text-lg text-gray-600 leading-relaxed">
+                        Our mission is to create intelligent, adaptable robotic systems that integrate seamlessly into existing workflows. By combining electrical, mechanical, and cognitive computing, we turn vision into reality.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Expertise Grid -->
+    <section id="expertise" class="py-32 bg-white">
+        <div class="container-width">
+            <div class="text-center mb-24 reveal">
+                <h2 class="text-4xl font-semibold tracking-tight text-gray-900">Engineering Harmony</h2>
+                <p class="mt-4 text-xl text-gray-500">A multidisciplinary approach to modern robotics.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card 1: Mechanical -->
+                <div class="tech-card bg-[#f5f5f7] p-10 rounded-3xl reveal">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                        <i data-lucide="settings-2" class="w-6 h-6 text-gray-900"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-3">Precision Mechanics</h4>
+                    <p class="text-gray-500 leading-relaxed text-sm">
+                        Advanced kinematic design and robust mechanical engineering ensuring durability in harsh manufacturing environments.
+                    </p>
+                </div>
+
+                <!-- Card 2: Electronics & Embedded -->
+                <div class="tech-card bg-[#f5f5f7] p-10 rounded-3xl reveal" style="transition-delay: 0.1s;">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                        <i data-lucide="cpu" class="w-6 h-6 text-gray-900"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-3">Embedded & IoT</h4>
+                    <p class="text-gray-500 leading-relaxed text-sm">
+                        Custom PCB design and real-time embedded systems that connect your machinery to the cloud for predictive analytics.
+                    </p>
+                </div>
+
+                <!-- Card 3: AI & Vision -->
+                <div class="tech-card bg-[#f5f5f7] p-10 rounded-3xl reveal" style="transition-delay: 0.2s;">
+                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                        <i data-lucide="eye" class="w-6 h-6 text-gray-900"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-3">Computer Vision</h4>
+                    <p class="text-gray-500 leading-relaxed text-sm">
+                        Proprietary AI algorithms for defect detection, object sorting, and autonomous navigation in dynamic spaces.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visual Divider / Image Area -->
+    <section class="w-full h-[60vh] bg-black relative overflow-hidden flex items-center justify-center">
+        <!-- Abstract Tech Background -->
+        <div class="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+        
+        <div class="relative z-10 text-center text-white px-4 reveal">
+            <h2 class="text-5xl md:text-6xl font-semibold tracking-tight mb-4">See beyond the line.</h2>
+            <p class="text-xl text-gray-300 font-light">Resonae Vision Systems integrate intelligence into every step.</p>
+        </div>
+    </section>
+
+    <!-- Solutions Detail -->
+    <section id="solutions" class="py-32 bg-[#f5f5f7]">
+        <div class="container-width">
+            <!-- Solution 1 -->
+            <div class="flex flex-col md:flex-row items-center gap-12 mb-32 reveal">
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop" alt="Manufacturing Arm" class="rounded-2xl shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
+                </div>
+                <div class="md:w-1/2">
+                    <h3 class="text-3xl font-semibold mb-4">Smart Manufacturing</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        We deploy collaborative robots (cobots) that work alongside humans. Our systems utilize multi-sensor fusion to ensure safety while increasing throughput by up to 40% in assembly and packaging lines.
+                    </p>
+                    <ul class="space-y-3 text-sm text-gray-500">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-black"></i> Adaptive Assembly Logic</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-black"></i> Predictive Maintenance IoT</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-black"></i> Energy Efficient Drive Systems</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Solution 2 -->
+            <div class="flex flex-col md:flex-row-reverse items-center gap-12 reveal">
+                <div class="md:w-1/2">
+                    <!-- Placeholder for schematic/technical drawing visual -->
+                    <div class="bg-white p-2 rounded-2xl shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=80&w=2006&auto=format&fit=crop" alt="PCB and AI" class="rounded-xl grayscale hover:grayscale-0 transition-all duration-700">
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <h3 class="text-3xl font-semibold mb-4">Embedded Intelligence</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">
+                        Hardware and software developed in unison. Our custom embedded solutions bring AI processing to the edge, reducing latency and reliance on external servers.
+                    </p>
+                    <a href="#contact" class="text-blue-600 hover:underline font-medium inline-flex items-center">
+                        Discuss your requirements <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer / Contact -->
+    <footer id="contact" class="bg-white py-20 border-t border-gray-200">
+        <div class="container-width">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div class="col-span-1 md:col-span-2">
+                    <h2 class="text-2xl font-semibold tracking-tight text-gray-900 mb-6">Resonae Labs</h2>
+                    <p class="text-gray-500 max-w-xs mb-8">
+                        Redefining the standard of industrial robotics through simplicity and innovation.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-black transition-colors"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black transition-colors"><i data-lucide="mail" class="w-5 h-5"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wider">Services</h4>
+                    <ul class="space-y-3 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-black">Industrial Automation</a></li>
+                        <li><a href="#" class="hover:text-black">Computer Vision</a></li>
+                        <li><a href="#" class="hover:text-black">IoT Integration</a></li>
+                        <li><a href="#" class="hover:text-black">Custom Embedded Systems</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wider">Company</h4>
+                    <ul class="space-y-3 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-black">About Us</a></li>
+                        <li><a href="#" class="hover:text-black">Careers</a></li>
+                        <li><a href="#" class="hover:text-black">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-black">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-20 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
+                <p>&copy; 2024 Resonae Labs. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Designed for the future.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        // Ensure lucide is loaded before calling
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        } else {
+            window.addEventListener('load', () => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            });
+        }
+
+        // --------------------------------------------------------
+        // THREE.JS HIGH-FIDELITY CYBERNETIC CORE
+        // --------------------------------------------------------
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            
+            // 1. Scene & Environment
+            const scene = new THREE.Scene();
+            // Background is handled by CSS for smoother gradient, kept transparent here or white fog
+            scene.fog = new THREE.FogExp2(0xffffff, 0.02);
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 14);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio); // Sharpness
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.physicallyCorrectLights = true; // Realistic lighting falloff
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.0;
+            container.appendChild(renderer.domElement);
+
+            // ------------------------------------------------
+            // MATERIALS (PBR - Physically Based Rendering)
+            // ------------------------------------------------
+            // Brushed Titanium
+            const metalMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x2a2a2a,
+                metalness: 0.9,
+                roughness: 0.4,
+                clearcoat: 0.8,
+                clearcoatRoughness: 0.2,
+                reflectivity: 1.0
+            });
+
+            // High-Gloss Black Polish
+            const obsidianMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x050505,
+                metalness: 0.2,
+                roughness: 0.0,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.0
+            });
+
+            // Glowing Optical Lens
+            const lensMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0x000000,
+                metalness: 0.5,
+                roughness: 0.1,
+                transmission: 0.9, // Glass-like
+                opacity: 1,
+                transparent: true,
+                emissive: 0x0044aa,
+                emissiveIntensity: 0.2
+            });
+
+            const glowingWireMaterial = new THREE.MeshBasicMaterial({
+                color: 0x007aff,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            // ------------------------------------------------
+            // GEOMETRY CONSTRUCTION: "Resonae Core" Droid Head
+            // ------------------------------------------------
+            const droidGroup = new THREE.Group();
+            scene.add(droidGroup);
+
+            // A. Main Cranium Shell (Layered Spheres)
+            const craniumGeo = new THREE.SphereGeometry(2.5, 64, 64);
+            const cranium = new THREE.Mesh(craniumGeo, metalMaterial);
+            cranium.castShadow = true;
+            droidGroup.add(cranium);
+
+            // B. Faceplate / Visor Cutout
+            // We use a slightly larger sphere intersection to create a "mask" look
+            const visorGeo = new THREE.SphereGeometry(2.55, 64, 64, 0, Math.PI * 2, 0, Math.PI * 0.35);
+            const visor = new THREE.Mesh(visorGeo, obsidianMaterial);
+            visor.rotation.x = -Math.PI / 2; // Point forward
+            visor.castShadow = true;
+            droidGroup.add(visor);
+
+            // C. The "Eye" (Optical Sensor)
+            const eyeGroup = new THREE.Group();
+            eyeGroup.position.set(0, 0, 2.2); // Push to front surface
+            droidGroup.add(eyeGroup);
+
+            // Outer Ring
+            const ringGeo = new THREE.TorusGeometry(0.8, 0.1, 16, 64);
+            const ring = new THREE.Mesh(ringGeo, metalMaterial);
+            eyeGroup.add(ring);
+
+            // Inner Lens
+            const lensGeo = new THREE.SphereGeometry(0.6, 32, 32);
+            const lens = new THREE.Mesh(lensGeo, lensMaterial);
+            lens.scale.z = 0.5; // Flattened lens
+            eyeGroup.add(lens);
+
+            // Central Pupil (Bright Emitter)
+            const pupilGeo = new THREE.SphereGeometry(0.2, 16, 16);
+            const pupilMat = new THREE.MeshBasicMaterial({ color: 0x00aaff });
+            const pupil = new THREE.Mesh(pupilGeo, pupilMat);
+            pupil.position.z = 0.4;
+            eyeGroup.add(pupil);
+
+            // D. Side Details (Sensors/Vents)
+            const earGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.5, 32);
+            const leftEar = new THREE.Mesh(earGeo, metalMaterial);
+            leftEar.rotation.z = Math.PI / 2;
+            leftEar.position.set(-2.4, 0, 0);
+            droidGroup.add(leftEar);
+
+            const rightEar = new THREE.Mesh(earGeo, metalMaterial);
+            rightEar.rotation.z = Math.PI / 2;
+            rightEar.position.set(2.4, 0, 0);
+            droidGroup.add(rightEar);
+
+            // Glowing Rings on Ears
+            const earRingGeo = new THREE.TorusGeometry(0.3, 0.05, 16, 32);
+            const leftEarRing = new THREE.Mesh(earRingGeo, glowingWireMaterial);
+            leftEarRing.rotation.y = Math.PI / 2;
+            leftEarRing.position.set(-2.7, 0, 0);
+            droidGroup.add(leftEarRing);
+
+            const rightEarRing = new THREE.Mesh(earRingGeo, glowingWireMaterial);
+            rightEarRing.rotation.y = Math.PI / 2;
+            rightEarRing.position.set(2.7, 0, 0);
+            droidGroup.add(rightEarRing);
+
+            // E. Floating Data Particles (Surrounding Field)
+            const particlesGeo = new THREE.BufferGeometry();
+            const particleCount = 200;
+            const posArray = new Float32Array(particleCount * 3);
+            
+            for(let i = 0; i < particleCount * 3; i++) {
+                // Random spread around the head
+                posArray[i] = (Math.random() - 0.5) * 15; 
+            }
+            particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMat = new THREE.PointsMaterial({
+                size: 0.05,
+                color: 0x888888,
+                transparent: true,
+                opacity: 0.6
+            });
+            const particleMesh = new THREE.Points(particlesGeo, particlesMat);
+            scene.add(particleMesh);
+
+            // ------------------------------------------------
+            // LIGHTING (Studio Setup for Reflections)
+            // ------------------------------------------------
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            // Main Key Light (Cool White)
+            const spotLight = new THREE.SpotLight(0xffffff, 10);
+            spotLight.position.set(5, 10, 10);
+            spotLight.angle = Math.PI / 6;
+            spotLight.penumbra = 0.5;
+            spotLight.castShadow = true;
+            spotLight.shadow.bias = -0.0001;
+            scene.add(spotLight);
+
+            // Rim Light (Blue) for Cybernetic feel
+            const rimLight = new THREE.PointLight(0x0055ff, 5, 20);
+            rimLight.position.set(-5, 2, -5);
+            scene.add(rimLight);
+
+            // Fill Light (Warm) for contrast
+            const fillLight = new THREE.PointLight(0xffaa00, 2, 20);
+            fillLight.position.set(5, -5, -5);
+            scene.add(fillLight);
+
+            // ------------------------------------------------
+            // INTERACTION & ANIMATION
+            // ------------------------------------------------
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetRotX = 0;
+            let targetRotY = 0;
+
+            const onMouseMove = (event) => {
+                // Normalize mouse position -1 to 1
+                mouseX = (event.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+                mouseY = (event.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+            };
+            document.addEventListener('mousemove', onMouseMove);
+
+            // Animation Loop
+            const clock = new THREE.Clock();
+            
+            const animate = () => {
+                requestAnimationFrame(animate);
+                const time = clock.getElapsedTime();
+
+                // 1. Smooth Droid Rotation Tracking (Inertia)
+                targetRotY = mouseX * 0.6; // Look left/right
+                targetRotX = mouseY * 0.4; // Look up/down
+
+                droidGroup.rotation.y += (targetRotY - droidGroup.rotation.y) * 0.05;
+                droidGroup.rotation.x += (targetRotX - droidGroup.rotation.x) * 0.05;
+
+                // 2. Idle "Hover" Animation
+                droidGroup.position.y = Math.sin(time) * 0.1;
+
+                // 3. Eye Pulse
+                pupilMat.opacity = 0.5 + Math.sin(time * 3) * 0.5;
+                
+                // 4. Particle Field Rotation (Slow background movement)
+                particleMesh.rotation.y = time * 0.05;
+                
+                // Parallax effect on particles based on mouse
+                particleMesh.rotation.x = mouseY * 0.1;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Resize Handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // Fade In
+            setTimeout(() => {
+                container.style.opacity = '1';
+            }, 500);
+        };
+
+        initThreeJS();
+
+        // --------------------------------------------------------
+        // SCROLL REVEAL ANIMATION
+        // --------------------------------------------------------
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 150;
+
+            revealElements.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+
+        // --------------------------------------------------------
+        // NAVBAR BLUR ON SCROLL
+        // --------------------------------------------------------
+        const nav = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-sm');
+            } else {
+                nav.classList.remove('shadow-sm');
+            }
+        });
+
+    </script>
+</body>
 </html>
