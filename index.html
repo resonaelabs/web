@@ -11,10 +11,10 @@
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
 
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -22,83 +22,106 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f5f5f7;
+            background-color: #ffffff;
             color: #1d1d1f;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
 
-        /* Hero Canvas Container */
+        /* Hero Layout */
+        .hero-section {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            background: radial-gradient(circle at 80% 50%, #f0f2f5 0%, #ffffff 60%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* The 3D Canvas - RIGHT SIDE ZONE */
         #canvas-container {
             position: absolute;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 0;
-            opacity: 0;
-            transition: opacity 1.5s ease;
-            background: radial-gradient(circle at center, #ffffff 0%, #e8e8ed 100%);
-            overflow: hidden;
-            cursor: none; /* Hide default cursor for immersion */
-        }
-
-        /* Custom Cursor UI (The Target Ring) */
-        #cursor-ring {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border: 2px solid rgba(0, 0, 0, 0.5);
-            border-radius: 50%;
-            pointer-events: none;
+            right: 0;
+            width: 55%; /* Keeps robot in its own zone */
+            height: 100%;
             z-index: 10;
-            transform: translate(-50%, -50%);
-            transition: width 0.1s, height 0.1s;
+            cursor: none; /* Hide cursor inside game zone */
         }
 
-        /* Score HUD */
+        /* Score HUD - Inside the canvas zone */
         #game-hud {
             position: absolute;
-            top: 100px;
+            top: 120px;
             right: 40px;
             text-align: right;
             pointer-events: none;
             z-index: 20;
-            font-weight: 700;
+            font-weight: 800;
             color: #d1d1d6;
             transition: color 0.3s;
         }
 
-        nav {
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background-color: rgba(255, 255, 255, 0.7);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+        /* Custom Cursor for the Game Zone */
+        #cursor-ring {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(0, 122, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 30;
+            transform: translate(-50%, -50%);
+            display: none; /* Hidden by default, shown when hovering canvas */
+        }
+
+        /* Typography */
+        h1 { letter-spacing: -0.03em; line-height: 1.1; }
+        
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -4px;
+            left: 0;
+            background-color: #000;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        .feature-card {
+            background: #fbfbfd;
+            border: 1px solid #f5f5f7;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            border-color: #e5e5e5;
+        }
+
+        .container-width {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px;
         }
 
         .reveal {
             opacity: 0;
             transform: translateY(30px);
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
-        .tech-card {
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
-        }
-        .tech-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-        }
-
-        .container-width {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 0 20px;
+        @media (max-width: 768px) {
+            .hero-section { flex-direction: column; padding-top: 80px; }
+            #canvas-container { position: relative; width: 100%; height: 50vh; order: 2; right: auto; }
+            .hero-content { order: 1; text-align: center; margin-bottom: 2rem; width: 100%; }
         }
     </style>
 </head>
@@ -108,183 +131,244 @@
     <div id="cursor-ring"></div>
 
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
-        <div class="container-width mx-auto h-12 flex items-center justify-between">
-            <a href="#" class="text-xl font-semibold tracking-tight text-gray-900 z-50">Resonae Labs</a>
-            <div class="hidden md:flex space-x-8 text-xs font-medium text-gray-600">
-                <a href="#philosophy" class="hover:text-black transition-colors">Philosophy</a>
-                <a href="#expertise" class="hover:text-black transition-colors">Expertise</a>
-                <a href="#solutions" class="hover:text-black transition-colors">Solutions</a>
-                <a href="#contact" class="hover:text-black transition-colors">Contact</a>
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
+        <div class="container-width mx-auto h-16 flex items-center justify-between">
+            <a href="#" class="text-lg font-bold tracking-tight text-black">
+                Resonae Labs.
+            </a>
+            
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-500">
+                <a href="#mission" class="nav-link hover:text-black transition-colors">Mission</a>
+                <a href="#expertise" class="nav-link hover:text-black transition-colors">Expertise</a>
+                <a href="#solutions" class="nav-link hover:text-black transition-colors">Solutions</a>
+                <a href="#contact" class="nav-link hover:text-black transition-colors">Contact</a>
             </div>
-            <button class="md:hidden text-gray-900 z-50"><i data-lucide="menu" class="w-5 h-5"></i></button>
+
+            <button class="md:hidden text-black"><i data-lucide="menu" class="w-6 h-6"></i></button>
         </div>
     </nav>
 
-    <!-- Hero Section (Game) -->
-    <header class="relative h-screen w-full flex items-center justify-center overflow-hidden">
-        <div id="canvas-container"></div>
+    <!-- HERO SECTION -->
+    <header class="hero-section">
         
-        <!-- Score HUD -->
-        <div id="game-hud">
-            <div class="text-6xl font-tighter" id="score-display">00</div>
-            <div class="text-sm tracking-widest uppercase">Collected</div>
+        <!-- 3D Element (Restricted to Right Side) -->
+        <div id="canvas-container">
+            <div id="game-hud">
+                <div class="text-5xl font-tighter" id="score-display">00</div>
+                <div class="text-xs tracking-widest uppercase text-gray-400">Captured</div>
+            </div>
         </div>
 
-        <div class="relative z-10 text-center px-4 mt-20 pointer-events-none">
-            <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter mb-6 text-gray-900 reveal active mix-blend-multiply">
-                Adaptive<br>Precision
-            </h1>
-            <p class="text-xl md:text-2xl text-gray-500 max-w-2xl mx-auto font-light leading-relaxed reveal active" style="transition-delay: 0.2s;">
-                Use the mouse to position the collector. Capture the falling components.
-            </p>
-            <div class="mt-8 reveal active" style="transition-delay: 0.4s;">
-                <div class="inline-flex items-center gap-2 text-xs font-mono text-gray-400 border border-gray-300 rounded-full px-4 py-1">
-                    <i data-lucide="mouse-pointer" class="w-3 h-3"></i> MOVE TO CATCH
+        <!-- Text Content (Left Side - Clean & Readable) -->
+        <div class="container-width w-full relative z-10 pointer-events-none md:pointer-events-auto">
+            <div class="hero-content md:w-5/12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-blue-100 bg-blue-50/50 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                    <span class="text-xs font-semibold tracking-wide text-blue-600 uppercase">Interactive Demo</span>
+                </div>
+                
+                <h1 class="text-6xl md:text-7xl font-extrabold text-black mb-6">
+                    Robots That See. <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Systems That Think.</span>
+                </h1>
+                
+                <p class="text-lg text-gray-500 font-light leading-relaxed mb-8">
+                End-to-end robotics and machine vision integration engineered for precision manufacturing and breakthrough efficiency.   
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#expertise" class="inline-flex items-center justify-center px-8 py-4 text-sm font-semibold text-white bg-black rounded-full hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl hover:scale-105 transform duration-200">
+                        Our Technology
+                    </a>
+                    <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 text-sm font-semibold text-black bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-all">
+                        Get in Touch
+                    </a>
                 </div>
             </div>
         </div>
         
-        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-50 z-10 pointer-events-none">
-            <i data-lucide="chevron-down" class="w-6 h-6 text-gray-400"></i>
+        <div class="absolute bottom-8 left-8 flex items-center gap-2 text-xs font-medium text-gray-400">
+            SCROLL TO EXPLORE <i data-lucide="arrow-down" class="w-3 h-3"></i>
         </div>
     </header>
 
-    <!-- Mission & Vision Section -->
-    <section id="philosophy" class="py-32 bg-[#f5f5f7]">
+    <!-- MISSION: THE ART OF AUTOMATION -->
+    <section id="mission" class="py-32 bg-white">
         <div class="container-width">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                 <div class="reveal">
-                    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">Our Philosophy</h2>
-                    <h3 class="text-4xl md:text-5xl font-semibold text-gray-900 mb-6 tracking-tight leading-tight">
-                        Complex technology,<br>made accessible.
+                    <h2 class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-3">Our Vision</h2>
+                    <h3 class="text-4xl md:text-5xl font-bold text-black mb-6 tracking-tight">
+                        The Art of Automation
                     </h3>
                 </div>
                 <div class="reveal" style="transition-delay: 0.2s;">
-                    <p class="text-lg text-gray-600 leading-relaxed mb-6">
-                        At Resonae Labs, we believe the future of manufacturing belongs to everyone. We exist to strip away the complexity of industrial automation.
+                    <p class="text-lg text-gray-500 leading-relaxed mb-6 font-light">
+                        Resonae Labs creates clarity from complexity. We combine <span class="font-semibold text-black">mechanical engineering</span>, <span class="font-semibold text-black">electronics</span>, and <span class="font-semibold text-black">artificial intelligence</span> into a single, unified discipline.
                     </p>
-                    <p class="text-lg text-gray-600 leading-relaxed">
-                        Our mission is to create intelligent, adaptable robotic systems that integrate seamlessly into existing workflows. By combining electrical, mechanical, and cognitive computing, we turn vision into reality.
+                    <p class="text-lg text-gray-500 leading-relaxed font-light">
+                        Our goal is simple: technology that works so well, it feels invisible.
                     </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Expertise Grid -->
-    <section id="expertise" class="py-32 bg-white">
+    <!-- EXPERTISE GRID -->
+    <section id="expertise" class="py-32 bg-[#f5f5f7]">
+        <div class="container-width">
+            <div class="flex justify-between items-end mb-20 reveal">
+                <div>
+                    <h2 class="text-3xl font-bold text-black">Core Competencies</h2>
+                    <p class="mt-2 text-gray-500">Multidisciplinary engineering under one roof.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Mechanical -->
+                <div class="feature-card p-8 rounded-3xl reveal">
+                    <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-6 text-black">
+                        <i data-lucide="settings-2" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Mechanical Design</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Robust kinematic chains and actuator systems designed for 24/7 industrial operation. We prioritize durability and ease of maintenance.
+                    </p>
+                </div>
+
+                <!-- Electronics -->
+                <div class="feature-card p-8 rounded-3xl reveal" style="transition-delay: 0.1s;">
+                    <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-6 text-black">
+                        <i data-lucide="zap" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Custom Electronics</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Bespoke PCB design and power management systems. Our hardware is built to handle the noise and heat of factory floors.
+                    </p>
+                </div>
+
+                <!-- Vision/AI -->
+                <div class="feature-card p-8 rounded-3xl reveal" style="transition-delay: 0.2s;">
+                    <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-6 text-black">
+                        <i data-lucide="scan-eye" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Vision & AI</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Machine learning at the edge. Our robots identify, sort, and inspect products in real-time with sub-millimeter accuracy.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOLUTIONS / VISUAL BREAK -->
+    <section id="solutions" class="py-32 bg-white">
         <div class="container-width">
             <div class="text-center mb-24 reveal">
-                <h2 class="text-4xl font-semibold tracking-tight text-gray-900">Engineering Harmony</h2>
-                <p class="mt-4 text-xl text-gray-500">A multidisciplinary approach to modern robotics.</p>
+                <h2 class="text-3xl font-bold text-black">Industrial Solutions</h2>
+                <p class="mt-2 text-gray-500">Scalable intelligence for the modern factory.</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="tech-card bg-[#f5f5f7] p-10 rounded-3xl reveal">
-                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm"><i data-lucide="settings-2" class="w-6 h-6 text-gray-900"></i></div>
-                    <h4 class="text-xl font-semibold mb-3">Precision Mechanics</h4>
-                    <p class="text-gray-500 leading-relaxed text-sm">Advanced kinematic design and robust mechanical engineering ensuring durability.</p>
-                </div>
-                <div class="tech-card bg-[#f5f5f7] p-10 rounded-3xl reveal" style="transition-delay: 0.1s;">
-                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm"><i data-lucide="cpu" class="w-6 h-6 text-gray-900"></i></div>
-                    <h4 class="text-xl font-semibold mb-3">Embedded & IoT</h4>
-                    <p class="text-gray-500 leading-relaxed text-sm">Custom PCB design and real-time embedded systems connecting machinery to the cloud.</p>
-                </div>
-                <div class="tech-card bg-[#f5f5f7] p-10 rounded-3xl reveal" style="transition-delay: 0.2s;">
-                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm"><i data-lucide="eye" class="w-6 h-6 text-gray-900"></i></div>
-                    <h4 class="text-xl font-semibold mb-3">Computer Vision</h4>
-                    <p class="text-gray-500 leading-relaxed text-sm">Proprietary AI algorithms for defect detection, object sorting, and autonomous navigation.</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Visual Divider -->
-    <section class="w-full h-[60vh] bg-black relative overflow-hidden flex items-center justify-center">
-        <div class="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-        <div class="relative z-10 text-center text-white px-4 reveal">
-            <h2 class="text-5xl md:text-6xl font-semibold tracking-tight mb-4">See beyond the line.</h2>
-            <p class="text-xl text-gray-300 font-light">Resonae Vision Systems integrate intelligence into every step.</p>
-        </div>
-    </section>
-
-    <!-- Solutions -->
-    <section id="solutions" class="py-32 bg-[#f5f5f7]">
-        <div class="container-width">
-            <div class="flex flex-col md:flex-row items-center gap-12 mb-32 reveal">
+            <!-- Solution 1: Smart Manufacturing -->
+            <div class="flex flex-col md:flex-row items-center gap-16 mb-32 reveal">
                 <div class="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop" alt="Arm" class="rounded-2xl shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
-                </div>
-                <div class="md:w-1/2">
-                    <h3 class="text-3xl font-semibold mb-4">Smart Manufacturing</h3>
-                    <p class="text-gray-600 leading-relaxed mb-6">We deploy collaborative robots (cobots) that work alongside humans, utilizing multi-sensor fusion.</p>
-                    <ul class="space-y-3 text-sm text-gray-500">
-                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-black"></i> Adaptive Assembly Logic</li>
-                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-black"></i> Predictive Maintenance IoT</li>
-                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-black"></i> Energy Efficient Drive Systems</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="flex flex-col md:flex-row-reverse items-center gap-12 reveal">
-                <div class="md:w-1/2">
-                    <div class="bg-white p-2 rounded-2xl shadow-2xl">
-                        <img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=80&w=2006&auto=format&fit=crop" alt="PCB" class="rounded-xl grayscale hover:grayscale-0 transition-all duration-700">
+                    <div class="relative overflow-hidden rounded-2xl shadow-xl bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop" alt="Smart Manufacturing Arm" class="w-full h-auto hover:scale-105 transition-transform duration-700">
                     </div>
                 </div>
                 <div class="md:w-1/2">
-                    <h3 class="text-3xl font-semibold mb-4">Embedded Intelligence</h3>
-                    <p class="text-gray-600 leading-relaxed mb-6">Hardware and software developed in unison. Custom embedded solutions bringing AI processing to the edge.</p>
+                    <h3 class="text-3xl font-bold mb-4">Smart Manufacturing</h3>
+                    <p class="text-gray-500 leading-relaxed mb-6">We deploy collaborative robots (cobots) that work alongside humans, utilizing multi-sensor fusion for safety and speed.</p>
+                    <ul class="space-y-3 text-sm text-gray-500">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-blue-600"></i> Adaptive Assembly Logic</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-blue-600"></i> Predictive Maintenance IoT</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-blue-600"></i> Energy Efficient Drive Systems</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Solution 2: Embedded Intelligence -->
+            <div class="flex flex-col md:flex-row-reverse items-center gap-16 mb-32 reveal">
+                <div class="md:w-1/2">
+                    <div class="relative overflow-hidden rounded-2xl shadow-xl bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=80&w=2006&auto=format&fit=crop" alt="PCB and Embedded Systems" class="w-full h-auto hover:scale-105 transition-transform duration-700">
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <h3 class="text-3xl font-bold mb-4">Embedded Intelligence</h3>
+                    <p class="text-gray-500 leading-relaxed mb-6">Hardware and software developed in unison. Custom embedded solutions bringing AI processing to the edge, reducing latency and reliance on external servers.</p>
                     <a href="#contact" class="text-blue-600 hover:underline font-medium inline-flex items-center">Discuss your requirements <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i></a>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Footer -->
-    <footer id="contact" class="bg-white py-20 border-t border-gray-200">
-        <div class="container-width">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
-                <div class="col-span-1 md:col-span-2">
-                    <h2 class="text-2xl font-semibold tracking-tight text-gray-900 mb-6">Resonae Labs</h2>
-                    <p class="text-gray-500 max-w-xs mb-8">Redefining the standard of industrial robotics through simplicity and innovation.</p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-black transition-colors"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-black transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-black transition-colors"><i data-lucide="mail" class="w-5 h-5"></i></a>
+            <!-- Solution 3: Cognitive Quality Control -->
+            <div class="flex flex-col md:flex-row items-center gap-16 reveal">
+                <div class="md:w-1/2">
+                    <div class="relative overflow-hidden rounded-2xl shadow-xl bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1516110833967-0b5716ca1387?q=80&w=2074&auto=format&fit=crop" alt="Vision Inspection System" class="w-full h-auto hover:scale-105 transition-transform duration-700">
                     </div>
                 </div>
-                <div>
-                    <h4 class="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wider">Services</h4>
+                <div class="md:w-1/2">
+                    <h3 class="text-3xl font-bold mb-4">Cognitive Quality Control</h3>
+                    <p class="text-gray-500 leading-relaxed mb-6">Zero-defect manufacturing powered by computer vision. Our systems inspect every micron of your product line, ensuring perfection at production speed.</p>
                     <ul class="space-y-3 text-sm text-gray-500">
-                        <li><a href="#" class="hover:text-black">Industrial Automation</a></li>
-                        <li><a href="#" class="hover:text-black">Computer Vision</a></li>
-                        <li><a href="#" class="hover:text-black">IoT Integration</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wider">Company</h4>
-                    <ul class="space-y-3 text-sm text-gray-500">
-                        <li><a href="#" class="hover:text-black">About Us</a></li>
-                        <li><a href="#" class="hover:text-black">Careers</a></li>
-                        <li><a href="#" class="hover:text-black">Contact</a></li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-blue-600"></i> Real-time Surface Inspection</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-blue-600"></i> Automated Defect Sorting</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-blue-600"></i> Data-Driven Process Insights</li>
                     </ul>
                 </div>
             </div>
-            <div class="mt-20 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
-                <p>&copy; 2024 Resonae Labs. All rights reserved.</p>
-                <p class="mt-2 md:mt-0">Designed for the future.</p>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="contact" class="bg-[#fbfbfd] py-20 border-t border-gray-100">
+        <div class="container-width">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div class="col-span-1 md:col-span-2">
+                    <h2 class="text-2xl font-bold mb-6">Resonae Labs.</h2>
+                    <p class="text-gray-500 max-w-xs mb-8 text-sm">
+                        Redefining the standard of industrial robotics through simplicity and innovation.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-gray-400 hover:text-black"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black"><i data-lucide="mail" class="w-5 h-5"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-black mb-4 text-sm">Services</h4>
+                    <ul class="space-y-3 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-blue-600">Industrial Automation</a></li>
+                        <li><a href="#" class="hover:text-blue-600">Computer Vision</a></li>
+                        <li><a href="#" class="hover:text-blue-600">IoT Integration</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-black mb-4 text-sm">Company</h4>
+                    <ul class="space-y-3 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-blue-600">About Us</a></li>
+                        <li><a href="#" class="hover:text-blue-600">Careers</a></li>
+                        <li><a href="#" class="hover:text-blue-600">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-20 pt-8 border-t border-gray-200 flex justify-between items-center text-xs text-gray-400">
+                <p>&copy; 2024 Resonae Labs.</p>
+                <p>Designed with precision.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Init Icons
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-        else window.addEventListener('load', () => lucide.createIcons());
+        lucide.createIcons();
 
         // --------------------------------------------------------
-        // THREE.JS ROBOTIC CATCHER GAME
+        // THREE.JS - WHITE & CHROME ROBOT (Right Side Game)
         // --------------------------------------------------------
         const initGame = () => {
             const container = document.getElementById('canvas-container');
@@ -294,153 +378,205 @@
 
             // Game State
             let score = 0;
-            let balls = []; // Array to hold falling objects
-            let lastPaddlePos = new THREE.Vector3();
-
-            // Scene
+            let balls = [];
+            
             const scene = new THREE.Scene();
-            scene.fog = new THREE.Fog(0xe8e8ed, 20, 60);
+            // Fog blends into the white background
+            scene.fog = new THREE.Fog(0xffffff, 15, 50);
 
-            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-            camera.position.set(0, 10, 30);
-            camera.lookAt(0, 5, 0);
+            // Camera setup to frame the right side comfortably
+            const camera = new THREE.PerspectiveCamera(35, container.clientWidth / container.clientHeight, 0.1, 100);
+            camera.position.set(0, 5, 20); // Closer, more intimate view
+            camera.lookAt(0, 3, 0);
 
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             container.appendChild(renderer.domElement);
 
-            // Lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(10, 20, 10);
-            dirLight.castShadow = true;
-            dirLight.shadow.mapSize.width = 2048;
-            dirLight.shadow.mapSize.height = 2048;
-            scene.add(dirLight);
+            // --- MATERIALS (Medical / High-End Tech) ---
+            const whiteMat = new THREE.MeshPhysicalMaterial({ 
+                color: 0xffffff, 
+                roughness: 0.2, 
+                metalness: 0.1,
+                clearcoat: 0.5
+            });
+            
+            const chromeMat = new THREE.MeshPhysicalMaterial({ 
+                color: 0xffffff, 
+                roughness: 0.0, 
+                metalness: 1.0 
+            });
 
-            // Floor
-            const floorGeo = new THREE.PlaneGeometry(100, 100);
-            const floorMat = new THREE.ShadowMaterial({ opacity: 0.1 });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            floor.receiveShadow = true;
-            scene.add(floor);
+            const accentMat = new THREE.MeshStandardMaterial({ 
+                color: 0x007aff, // Blue
+                emissive: 0x001a33,
+                roughness: 0.2
+            });
 
-            // Grid
-            const grid = new THREE.GridHelper(100, 100, 0xcccccc, 0xe5e5e5);
-            scene.add(grid);
+            const glassMat = new THREE.MeshPhysicalMaterial({
+                color: 0x007aff,
+                metalness: 0.1,
+                roughness: 0.1,
+                transmission: 0.6,
+                transparent: true,
+                opacity: 0.7
+            });
 
-            // --- MATERIALS ---
-            const darkMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.4, metalness: 0.6 });
-            const trayMat = new THREE.MeshStandardMaterial({ color: 0x007aff, roughness: 0.2, metalness: 0.5, transparent: true, opacity: 0.8 });
-            const trayRimMat = new THREE.MeshBasicMaterial({ color: 0x00ccff });
-            const ballMat = new THREE.MeshPhysicalMaterial({ color: 0xff3333, metalness: 0.1, roughness: 0.1, clearcoat: 1.0 });
+            const ballMat = new THREE.MeshPhysicalMaterial({ 
+                color: 0xff3366, 
+                metalness: 0.1, 
+                roughness: 0.1, 
+                clearcoat: 1.0 
+            });
 
-            // --- ROBOT ARM (IK System) ---
-            const base = new THREE.Mesh(new THREE.CylinderGeometry(2, 2.5, 1, 32), darkMat);
-            base.position.y = 0.5;
-            base.castShadow = true;
-            scene.add(base);
+            // --- ROBOT MODEL (Compact) ---
+            const robotGroup = new THREE.Group();
+            scene.add(robotGroup);
+            robotGroup.position.y = -2; // Anchor to bottom visual floor
+
+            // Base
+            const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2, 0.5, 64), whiteMat);
+            base.receiveShadow = true;
+            robotGroup.add(base);
 
             // Turret
             const turret = new THREE.Group();
-            turret.position.y = 1;
-            scene.add(turret);
-            const turretMesh = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 1, 32), darkMat);
+            turret.position.y = 0.25;
+            robotGroup.add(turret);
+            const turretMesh = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 1, 64), whiteMat);
             turretMesh.position.y = 0.5;
             turretMesh.castShadow = true;
             turret.add(turretMesh);
 
+            // Arm Dimensions (Compact)
+            const armWidth = 0.8;
+            const upperArmLen = 4.5; // Shortened
+            const forearmLen = 4.5;  // Shortened
+
             // Upper Arm
             const upperArmPivot = new THREE.Group();
-            upperArmPivot.position.y = 1; 
+            upperArmPivot.position.y = 1;
             turret.add(upperArmPivot);
-            
-            const upperArmLength = 8;
-            const upperArmMesh = new THREE.Mesh(new THREE.BoxGeometry(1, upperArmLength, 1), darkMat);
-            upperArmMesh.position.y = upperArmLength / 2;
-            upperArmMesh.castShadow = true;
-            upperArmPivot.add(upperArmMesh);
+
+            const uArmGeo = new THREE.BoxGeometry(armWidth, upperArmLen, armWidth);
+            const uArm = new THREE.Mesh(uArmGeo, whiteMat);
+            uArm.position.y = upperArmLen / 2;
+            uArm.castShadow = true;
+            upperArmPivot.add(uArm);
+
+            // Chrome Joint
+            const elbowGeo = new THREE.CylinderGeometry(0.5, 0.5, 1.2, 32);
+            const elbow = new THREE.Mesh(elbowGeo, chromeMat);
+            elbow.rotation.z = Math.PI/2;
+            elbow.position.y = upperArmLen;
+            upperArmPivot.add(elbow);
 
             // Forearm
             const forearmPivot = new THREE.Group();
-            forearmPivot.position.y = upperArmLength;
+            forearmPivot.position.y = upperArmLen;
             upperArmPivot.add(forearmPivot);
 
-            const forearmLength = 8;
-            const forearmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.8, forearmLength, 0.8), darkMat);
-            forearmMesh.position.y = forearmLength / 2;
-            forearmMesh.castShadow = true;
-            forearmPivot.add(forearmMesh);
+            const fArmGeo = new THREE.BoxGeometry(0.6, forearmLen, 0.6);
+            const fArm = new THREE.Mesh(fArmGeo, whiteMat);
+            fArm.position.y = forearmLen / 2;
+            fArm.castShadow = true;
+            forearmPivot.add(fArm);
 
-            // End Effector (COLLECTION TRAY)
-            const paddlePivot = new THREE.Group();
-            paddlePivot.position.y = forearmLength;
-            forearmPivot.add(paddlePivot);
+            // Collector Tray (End Effector)
+            const wristPivot = new THREE.Group();
+            wristPivot.position.y = forearmLen;
+            forearmPivot.add(wristPivot);
 
-            // Tray Group
             const trayGroup = new THREE.Group();
-            paddlePivot.add(trayGroup);
+            wristPivot.add(trayGroup);
 
-            // Tray Base
-            const trayBase = new THREE.Mesh(new THREE.CylinderGeometry(3, 2, 0.5, 32), trayMat);
+            // Tray Visuals
+            const trayBase = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 1, 0.5, 32), glassMat);
             trayBase.castShadow = true;
             trayGroup.add(trayBase);
-
-            // Tray Rim (Visual Target)
-            const trayRim = new THREE.Mesh(new THREE.TorusGeometry(3, 0.1, 16, 32), trayRimMat);
-            trayRim.rotation.x = Math.PI / 2;
+            
+            const trayRim = new THREE.Mesh(new THREE.TorusGeometry(2.5, 0.1, 32, 64), chromeMat);
+            trayRim.rotation.x = Math.PI/2;
             trayRim.position.y = 0.25;
             trayGroup.add(trayRim);
 
-            // --- SPAWN FALLING OBJECTS ---
+            // --- LIGHTING ---
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+            
+            const spotLight = new THREE.SpotLight(0xffffff, 1);
+            spotLight.position.set(5, 15, 10);
+            spotLight.castShadow = true;
+            spotLight.shadow.mapSize.width = 1024;
+            spotLight.shadow.mapSize.height = 1024;
+            scene.add(spotLight);
+
+            const blueLight = new THREE.PointLight(0x007aff, 0.5);
+            blueLight.position.set(-5, 5, 0);
+            scene.add(blueLight);
+
+            // Floor Shadow Plane
+            const planeMat = new THREE.ShadowMaterial({ opacity: 0.05 });
+            const plane = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), planeMat);
+            plane.rotation.x = -Math.PI / 2;
+            plane.position.y = -2;
+            plane.receiveShadow = true;
+            scene.add(plane);
+
+            // --- INTERACTION LOGIC ---
+            const mouse = new THREE.Vector2();
+            const target = new THREE.Vector3(0, 5, 0);
+            const raycaster = new THREE.Raycaster();
+
+            // Handle Mouse Move ONLY within canvas or relative to window
+            document.addEventListener('mousemove', (e) => {
+                // Calculate mouse relative to the container element
+                const rect = container.getBoundingClientRect();
+                
+                // If mouse is near or in the container, show ring
+                if (e.clientX > rect.left) {
+                    cursorRing.style.display = 'block';
+                    cursorRing.style.left = e.clientX + 'px';
+                    cursorRing.style.top = e.clientY + 'px';
+                    
+                    // Normalize mouse coordinates (-1 to +1) based on the canvas dimensions
+                    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+                } else {
+                    cursorRing.style.display = 'none';
+                }
+            });
+
+            // --- GAME LOGIC ---
             const spawnBall = () => {
-                const b = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 32), ballMat);
-                // Random spawn X/Z within range
-                const x = (Math.random() - 0.5) * 20;
-                const z = (Math.random() - 0.5) * 10 + 5; // Slightly forward
-                b.position.set(x, 25, z);
+                const b = new THREE.Mesh(new THREE.SphereGeometry(0.6, 32, 32), ballMat);
+                // Constrain spawn area to keep it within view
+                b.position.set((Math.random() - 0.5) * 10, 15, (Math.random() - 0.5) * 5);
                 b.castShadow = true;
-                
-                // Add custom properties for velocity
-                b.userData = { velocityY: 0 };
-                
+                b.userData = { velY: 0 };
                 scene.add(b);
                 balls.push(b);
             };
 
-            // Spawn first ball
+            setInterval(spawnBall, 2500); // New ball every 2.5s
             spawnBall();
-            // Spawn interval
-            setInterval(spawnBall, 3000); // Every 3 seconds
 
-            // --- GAME LOGIC VARS ---
-            const target = new THREE.Vector3(0, 10, 5); 
-            const mouse = new THREE.Vector2();
-            const raycaster = new THREE.Raycaster();
-
-            document.addEventListener('mousemove', (e) => {
-                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-                cursorRing.style.left = e.clientX + 'px';
-                cursorRing.style.top = e.clientY + 'px';
-            });
-
-            const solveIK = (targetPos) => {
-                const angleY = Math.atan2(targetPos.x, targetPos.z);
+            // IK Solver
+            const solveIK = (tgt) => {
+                // Turret Y
+                const angleY = Math.atan2(tgt.x, tgt.z);
                 turret.rotation.y = angleY;
 
-                const distXZ = Math.sqrt(targetPos.x**2 + targetPos.z**2);
-                const distY = targetPos.y - 2;
+                // Arm Angles (Planar)
+                const distXZ = Math.sqrt(tgt.x**2 + tgt.z**2);
+                const distY = tgt.y - robotGroup.position.y - 1; // Adjust for base height
                 const distDirect = Math.sqrt(distXZ**2 + distY**2);
 
-                const l1 = upperArmLength;
-                const l2 = forearmLength;
-                
+                // Clamp reach
+                const l1 = upperArmLen;
+                const l2 = forearmLen;
                 const reach = Math.min(distDirect, l1 + l2 - 0.1);
 
                 const cosAngle2 = (reach**2 - l1**2 - l2**2) / (2 * l1 * l2);
@@ -453,105 +589,94 @@
 
                 upperArmPivot.rotation.x = (Math.PI / 2) - angle1;
                 forearmPivot.rotation.x = angle2;
-                paddlePivot.rotation.x = -(upperArmPivot.rotation.x + forearmPivot.rotation.x);
+                
+                // Keep tray level
+                wristPivot.rotation.x = -(upperArmPivot.rotation.x + forearmPivot.rotation.x);
             };
 
-            // --- ANIMATION LOOP ---
             const animate = () => {
                 requestAnimationFrame(animate);
 
-                // 1. Mouse Target Logic
+                // Update Target
                 raycaster.setFromCamera(mouse, camera);
-                const virtualPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -10);
-                const interactPoint = new THREE.Vector3();
-                raycaster.ray.intersectPlane(virtualPlane, interactPoint);
+                const planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), -5); // Interaction plane
+                const intersect = new THREE.Vector3();
+                raycaster.ray.intersectPlane(planeZ, intersect);
                 
-                interactPoint.x = Math.max(-15, Math.min(15, interactPoint.x));
-                interactPoint.y = Math.max(2, Math.min(20, interactPoint.y));
-                interactPoint.z = Math.max(-5, Math.min(15, interactPoint.z));
-
-                target.lerp(interactPoint, 0.2);
+                // Lerp target for smoothness
+                if (intersect) {
+                    target.lerp(intersect, 0.1);
+                    // Clamp target to prevent weird IK flips
+                    target.y = Math.max(0, Math.min(10, target.y));
+                    target.x = Math.max(-8, Math.min(8, target.x));
+                    target.z = Math.max(-5, Math.min(8, target.z));
+                }
+                
                 solveIK(target);
 
-                const paddleWorldPos = new THREE.Vector3();
-                trayBase.getWorldPosition(paddleWorldPos);
+                const trayPos = new THREE.Vector3();
+                trayBase.getWorldPosition(trayPos);
 
-                // 2. Process Balls
+                // Physics Loop
                 for (let i = balls.length - 1; i >= 0; i--) {
                     const b = balls[i];
                     
-                    // Gravity (Very Low Speed)
-                    b.userData.velocityY -= 0.015; 
-                    b.position.y += b.userData.velocityY;
+                    // Gravity
+                    b.userData.velY -= 0.02; // Slow fall
+                    b.position.y += b.userData.velY;
 
-                    // Check Catch
-                    const dist = b.position.distanceTo(paddleWorldPos);
-                    // Catch radius approx 3, height diff small
-                    if (dist < 3 && Math.abs(b.position.y - paddleWorldPos.y) < 2) {
-                        // CAUGHT!
+                    // Catch Check
+                    const dist = b.position.distanceTo(trayPos);
+                    if (dist < 2.5 && Math.abs(b.position.y - trayPos.y) < 1.5) {
+                        // Caught
                         score++;
                         scoreDisplay.innerText = score.toString().padStart(2, '0');
                         hud.style.color = '#007aff';
                         setTimeout(() => hud.style.color = '#d1d1d6', 200);
 
-                        // Attach to tray
+                        // Attach visual to tray
                         trayGroup.add(b);
-                        // Snap to center of tray with slight random offset to prevent clipping
-                        b.position.set((Math.random()-0.5)*0.5, 0.5 + (Math.random()*0.5), (Math.random()-0.5)*0.5);
-                        // Remove physics velocity
-                        b.userData.velocityY = 0;
-
-                        // Remove from falling balls array logic
-                        balls.splice(i, 1);
+                        b.position.set((Math.random()-0.5), 0.5 + Math.random(), (Math.random()-0.5));
+                        b.userData.velY = 0;
                         
-                        continue; 
+                        balls.splice(i, 1);
+                        continue;
                     }
 
-                    // Missed (Floor)
-                    if (b.position.y < -2) {
+                    // Floor removal
+                    if (b.position.y < -5) {
                         scene.remove(b);
                         balls.splice(i, 1);
                     }
                 }
-                
-                // Ensure at least one ball is always active if array empty (rare)
-                if (balls.length === 0) spawnBall();
 
                 renderer.render(scene, camera);
             };
 
             animate();
 
+            // Responsive Resize
             window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                camera.aspect = w / h;
                 camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setSize(w, h);
             });
 
-            setTimeout(() => { container.style.opacity = '1'; }, 500);
+            setTimeout(() => container.style.opacity = '1', 500);
         };
 
         initGame();
 
-        // Scroll Reveal
+        // Scroll Logic
         const revealElements = document.querySelectorAll('.reveal');
-        const revealOnScroll = () => {
-            const windowHeight = window.innerHeight;
-            revealElements.forEach((reveal) => {
-                if (reveal.getBoundingClientRect().top < windowHeight - 150) {
-                    reveal.classList.add('active');
-                }
-            });
-        };
-        window.addEventListener('scroll', revealOnScroll);
-        revealOnScroll();
-
-        // Navbar Shadow
-        const nav = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
-            nav.classList.toggle('shadow-sm', window.scrollY > 50);
+            const h = window.innerHeight;
+            revealElements.forEach(el => {
+                if (el.getBoundingClientRect().top < h - 100) el.classList.add('active');
+            });
         });
-
     </script>
 </body>
 </html>
